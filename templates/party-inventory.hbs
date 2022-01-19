@@ -1,0 +1,45 @@
+<form class="flexcol">
+	<div class="items-list">
+		<ul class="inventory-list">
+			{{#each items as |item|}}
+				<li class="item flexrow" data-item-id="{{item.id}}" draggable="true">
+					<div class="item-name flexrow">
+						<div class="item-image" tabindex="0" role="button" aria-label="{{item.name}}" style="background-image: url('{{item.img}}')"></div>
+						<h4>
+							{{item.name~}}
+							{{~#if item.isStack}} ({{item.data.data.quantity}}){{/if}}
+						</h4>
+					</div>
+					<div class="item-detail">
+						{{item.actor.name}}
+					</div>
+				</li>
+			{{/each}}
+		</ul>
+
+		<p>Scratchpad</p>
+		<ul class="scratchpad">
+			{{#each scratchpadItems as |item|}}
+				<li class="item" data-item-id={{item.id}}>
+					<div class="item-row flexrow">
+						<div class="item-name flexrow">
+							<img class="item-image" tabindex="0" role="button" aria-label="{{item.name}}" src="{{item.img}}" data-edit="{{item.id}}.img" />
+							<input class="flex2" type="text" value="{{item.name}}" name="{{item.id}}.name" placeholder="{{localize "PARTY-INVENTORY.name-placeholder"}}" data-dtype="String" />
+						</div>
+						<select class="item-type-select" name="{{id}}.type" data-dtype="String">
+							{{selectOptions ../typeLabels selected=type localize=true}}
+						</select>
+						<a class="item-control item-delete flex0" data-action="delete" title="{{localize "PARTY-INVENTORY.delete-item"}}">
+							<i class="fas fa-trash"></i>
+						</a>
+					</div>
+					<div class="description-container">
+						<textarea class="item-description" name="{{item.id}}.description" placeholder="{{localize "PARTY-INVENTORY.description-placeholder"}}">{{item.description}}</textarea>
+					</div>
+				</li>
+			{{/each}}
+		</ul>
+	</div>
+
+	<button class="flex0" type="button" data-action="create"><i class="fas fa-plus"></i> {{localize "PARTY-INVENTORY.add-new"}}</button>
+</form>
