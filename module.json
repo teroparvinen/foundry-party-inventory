@@ -1,28 +1,28 @@
 {
-	"name": "party-inventory",
-	"title": "Party Inventory",
-	"description": "Shows items carried by characters flagged as Party Loot in one list.",
-	"authors": [
-		{
-			"name": "Tero Parvinen"
-		}
-	],
-	"version": "1.0",
-	"minimumCoreVersion": "9",
-	"compatibleCoreVersion": "9",
-	"system": ["dnd5e"],
-	"esmodules": [
-		"./module/party-inventory.js"
-	],
-	"styles": [
-		"styles/party-inventory.css"
-	],
-	"languages": [
-		{
-			"lang": "en",
-			"name": "English",
-			"path": "./lang/en.json"
-		}
-	],
-	"socket": true
+    "name": "party-inventory",
+    "title": "Party Inventory",
+    "description": "Shows items carried by characters flagged as Party Loot in one list.",
+    "authors": [
+        {
+            "name": "Tero Parvinen"
+        }
+    ],
+    "version": "1.0",
+    "minimumCoreVersion": "9",
+    "compatibleCoreVersion": "9",
+    "system": ["dnd5e"],
+    "esmodules": [
+        "./module/party-inventory.js"
+    ],
+    "styles": [
+        "styles/party-inventory.css"
+    ],
+    "languages": [
+        {
+            "lang": "en",
+            "name": "English",
+            "path": "./lang/en.json"
+        }
+    ],
+    "socket": true
 }

@@ -1,13 +1,13 @@
 {
-	"PARTY-INVENTORY": {
-		"button-title": "Party Inventory",
-		"window-title": "Party Inventory",
-		"enable-item-title": "Add to Party Inventory",
-		"disable-item-title": "Remove from Party Inventory",
-		"is-in-party-inventory": "In Party Inventory",
-		"add-new": "Add New Scratchpad Entry",
-		"delete-item": "Delete item",
-		"name-placeholder": "New item",
-		"description-placeholder": "Description"
-	}
+    "PARTY-INVENTORY": {
+        "button-title": "Party Inventory",
+        "window-title": "Party Inventory",
+        "enable-item-title": "Add to Party Inventory",
+        "disable-item-title": "Remove from Party Inventory",
+        "is-in-party-inventory": "In Party Inventory",
+        "add-new": "Add New Scratchpad Entry",
+        "delete-item": "Delete item",
+        "name-placeholder": "New item",
+        "description-placeholder": "Description"
+    }
 }
