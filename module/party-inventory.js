@@ -6,23 +6,6 @@ Hooks.on('setup', () => {
 	game.settings.register(moduleId, 'scratchpad', { scope: 'world', type: Object });
 });
 
-Hooks.on('renderPlayerList', (playerList, html) => {
-	const insertPoint = html.find(`[data-user-id="${game.userId}"]`)
-
-	const tooltip = game.i18n.localize(`${localizationID}.button-title`);
-	insertPoint.append(
-		`<button type='button' class='open-party-inventory-button flex0' title='${tooltip}'><i class='fas fa-tasks'></i></button>`
-	);
-
-	html.on('click', '.open-party-inventory-button', (event) => {
-		event.stopPropagation();
-
-		PartyInventory.activate();
-
-		return false;
-	});
-});
-
 Hooks.on('renderActorSheet5eCharacter', (sheet, html, character) => {
 	let sheetClasses = sheet.options.classes;
 	if (sheetClasses[0] === "tidy5e") {
@@ -31,6 +14,17 @@ Hooks.on('renderActorSheet5eCharacter', (sheet, html, character) => {
 	} else {
 		addTogglePartyButton(html, sheet.actor);
 	}
+});
+
+Hooks.on('getActorSheet5eCharacterHeaderButtons', (app, buttons) => {
+	buttons.unshift({
+		class: 'open-party-inventory-button',
+		icon: 'fas fa-users',
+		label: game.i18n.localize(`${localizationID}.button-title`),
+		onclick: () => {
+			PartyInventory.activate();
+		}
+	});
 });
 
 Hooks.on('updateItem', (item) => {
