@@ -30,6 +30,9 @@ Hooks.on('getActorSheet5eCharacterHeaderButtons', (app, buttons) => {
 Hooks.on('updateItem', (item) => {
     PartyInventory.refresh();
 });
+Hooks.on('deleteItem', (item) => {
+    PartyInventory.refresh();
+});
 
 Hooks.on('createSetting', (setting) => {
     if (setting.key == `${moduleId}.scratchpad`) {

@@ -97,3 +97,12 @@ Hooks.on('setup', () => {
         }
     });
 });
+
+Hooks.on('createItem', (item) => {
+    if (game.user.isGM) {
+        const id = item.getFlag(moduleId, 'scratchpadId');
+        if (id) {
+            Scratchpad.deleteItem(id);
+        }
+    }
+});

@@ -80,7 +80,11 @@ export class PartyInventory extends FormApplication {
         console.log('_updateObject', data);
 
         for (let id in data) {
-            Scratchpad.requestUpdate(id, data[id]);
+            const existing = Scratchpad.getItem(id);
+            const diff = foundry.utils.diffObject(existing, data[id]);
+            if (!foundry.utils.isObjectEmpty(diff)) {
+                Scratchpad.requestUpdate(id, diff);
+            }
         }
     }
 
@@ -203,6 +207,11 @@ export class PartyInventory extends FormApplication {
                 img: item.img,
                 data: {
                     description: { value: `<p>${item.description}</p>` }
+                },
+                flags: {
+                    [moduleId]: {
+                        scratchpadId: itemId
+                    }
                 }
             }
         }));

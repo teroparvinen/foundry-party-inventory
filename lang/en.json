@@ -8,6 +8,7 @@
         "add-new": "Add New Scratchpad Entry",
         "delete-item": "Delete item",
         "name-placeholder": "New item",
-        "description-placeholder": "Description"
+        "description-placeholder": "Description",
+        "scratchpad-title": "Scratchpad"
     }
 }
