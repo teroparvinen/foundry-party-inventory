@@ -24,10 +24,9 @@ export class PartyInventory extends FormApplication {
                 {
                     dragSelector: '.scratchpad .item',
                 },
-                // TODO: Initialize based on compendium drop
-                // {
-                // 	dropSelector: '.scratchpad'
-                // }
+                {
+                	dropSelector: '.scratchpad'
+                }
             ]
         };
 
@@ -66,6 +65,7 @@ export class PartyInventory extends FormApplication {
         this._items = items;
 
         items.forEach(i => { i.isStack = i.data.data.quantity > 1 });
+        items.forEach(i => { i.charName = i.actor.name.split(' ')[0] });
 
         const typeLabels = CONFIG.Item.typeLabels;
 
@@ -76,8 +76,6 @@ export class PartyInventory extends FormApplication {
 
     async _updateObject(event, formData) {
         const data = foundry.utils.expandObject(formData);
-
-        console.log('_updateObject', data);
 
         for (let id in data) {
             const existing = Scratchpad.getItem(id);
@@ -199,21 +197,30 @@ export class PartyInventory extends FormApplication {
         const itemId = li.data("item-id");
         const item = Scratchpad.getItem(itemId)
 
-        event.dataTransfer.setData("text/plain", JSON.stringify({
-            type: "Item",
-            data: {
-                type: item.type,
-                name: item.name,
-                img: item.img,
-                data: {
-                    description: { value: `<p>${item.description}</p>` }
-                },
-                flags: {
-                    [moduleId]: {
-                        scratchpadId: itemId
-                    }
+        let data = {
+            type: item.type,
+            name: item.name,
+            img: item.img,
+            flags: {
+                [moduleId]: {
+                    scratchpadId: itemId
                 }
             }
+        };
+        if (item.description && item.description.trim()) {
+            data = foundry.utils.mergeObject(data, {
+                data: {
+                    description: { value: `<p>${item.description}</p>` }
+                }
+            });
+        }
+        if (item.sourceData) {
+            data = foundry.utils.mergeObject(item.sourceData, data);
+        }
+
+        event.dataTransfer.setData("text/plain", JSON.stringify({
+            type: "Item",
+            data: data
         }));
         event.dataTransfer.setDragImage(
             li[0],
@@ -221,9 +228,38 @@ export class PartyInventory extends FormApplication {
             event.pageY - li.offset().top);
     }
 
-    _onDrop(event) {
+    async _onDrop(event) {
         const dataStr = event.dataTransfer.getData('text/plain');
         const data = JSON.parse(dataStr);
-        console.log('DROP', data);
+
+        if (data.type !== 'Item' || data.data.flags[moduleId].scratchpadId) { return false; }
+
+        function createFromData(data) {
+            Scratchpad.requestCreate({
+                type: data.type,
+                name: data.name,
+                img: data.img,
+                sourceData: data
+            });
+        }
+
+        if (data.data) {
+            createFromData(data.data);
+            return true;
+        } else if (data.pack && data.id) {
+            const pack = game.packs.get(data.pack);
+            if (pack.documentName == 'Item') {
+                const document = await pack.getDocument(data.id);
+                createFromData(document.data);
+                return true;
+            }
+        } else if (data.id) {
+            const collection = CONFIG['Item'].collection.instance;
+            const document = collection.get(data.id)
+            createFromData(document.data);
+            return true;
+    }
+
+        return true;
     }
 }

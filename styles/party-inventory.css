@@ -1,3 +1,12 @@
+.dnd5e.sheet.actor.character .inventory .item-controls {
+    flex: 0 0 86px !important;
+}
+
+#party-inventory .item-owner-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .scratchpad {
     padding: 0 5px;
 }

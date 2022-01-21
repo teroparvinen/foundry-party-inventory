@@ -26,6 +26,19 @@ Hooks.on('getActorSheet5eCharacterHeaderButtons', (app, buttons) => {
         }
     });
 });
+Hooks.on('getSceneControlButtons', (controls) => {
+    const notes = controls.find((c) => c.name === 'notes');
+    if (notes) {
+        notes.tools.push({
+            name: moduleId,
+            title: `${localizationID}.button-title`,
+            icon: 'fas fa-users',
+            visible: true,
+            onClick: () => PartyInventory.activate(),
+            button: true
+        });
+    }
+});
 
 Hooks.on('updateItem', (item) => {
     PartyInventory.refresh();

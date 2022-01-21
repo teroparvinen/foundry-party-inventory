@@ -14,7 +14,7 @@ When the DM hands out loot, not all of the items qualify as standard gear from t
 
 ## Usage
 
-The party inventory sheet can be accessed through a header button on the character sheet.
+The party inventory sheet can be accessed through a header button on the character sheet or a button in the note layer scene controls.
 
 Any item on a character sheet can be toggled to be visible in the party inventory. Only items owned by a character with a player owner are listed.
 
@@ -32,7 +32,11 @@ Each item can be given
 - a type
 - an icon, if the [Icon Picker](https://github.com/teroparvinen/foundry-icon-picker) module is installed
 
-Drag an item from the scratchpad onto a character sheet to actually create the item. Because most of the scratchpad is input fields, try to drag from or below the icon.
+Drag an item from the scratchpad onto a character sheet to actually create the item. Because most of the scratchpad is input fields, try to drag from or below the icon. When the item is added to a character's inventory, it is removed from the scratchpad.
+
+Items can also be dragged onto the scratchpad from a compendium, from the world item list or from a character sheet. This can be used by the DM to award loot to the party as a whole or by single players to hand out something to be picked up by someone else without agreeing who the recipient is beforehand.
+
+## Limitations
 
 Technically, modifying the scratchpad requires message passing to a Gamemaster user and will not work unless a GM is logged in. In practice, you'd only run into this situation on a remotely hosted always-on server. Nothing will break, but you'll have to wait for the GM to log on if you want to use the scratchpad.
 
