@@ -232,7 +232,7 @@ export class PartyInventory extends FormApplication {
         const dataStr = event.dataTransfer.getData('text/plain');
         const data = JSON.parse(dataStr);
 
-        if (data.type !== 'Item' || data.data.flags[moduleId].scratchpadId) { return false; }
+        if (data.type !== 'Item' || data.data?.flags?.[moduleId]?.scratchpadId) { return false; }
 
         function createFromData(data) {
             Scratchpad.requestCreate({
@@ -258,7 +258,7 @@ export class PartyInventory extends FormApplication {
             const document = collection.get(data.id)
             createFromData(document.data);
             return true;
-    }
+        }
 
         return true;
     }
