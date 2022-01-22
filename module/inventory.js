@@ -153,14 +153,14 @@ export class PartyInventory extends FormApplication {
         const itemId = clickedElement.parents('[data-item-id]').data()?.itemId;
 
         switch (action) {
-            case 'create': {
+            case 'create':
                 Scratchpad.requestCreate({
                     img: CONFIG.Item.documentClass.schema.DEFAULT_ICON
                 });
-            }
-            case 'delete': {
+                break;
+            case 'delete':
                 Scratchpad.requestDelete(itemId);
-            }
+                break;
         }
     }
 

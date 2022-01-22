@@ -3,7 +3,17 @@ import { addTogglePartyButton, addTogglePartyButtonTidy, addGroupInventoryIndica
 import { PartyInventory } from './inventory.js';
 
 Hooks.on('setup', () => {
-    game.settings.register(moduleId, 'scratchpad', { scope: 'world', type: Object });
+    game.settings.register(moduleId, 'scratchpad', { 
+        scope: 'world',
+        type: Object,
+        default: {
+            items: {},
+            order: []
+        },
+        onChange: value => {
+            PartyInventory.refresh();
+        }
+    });
 });
 
 Hooks.on('renderActorSheet5eCharacter', (sheet, html, character) => {
@@ -45,15 +55,4 @@ Hooks.on('updateItem', (item) => {
 });
 Hooks.on('deleteItem', (item) => {
     PartyInventory.refresh();
-});
-
-Hooks.on('createSetting', (setting) => {
-    if (setting.key == `${moduleId}.scratchpad`) {
-        PartyInventory.refresh();
-    }
-});
-Hooks.on('updateSetting', (setting) => {
-    if (setting.key == `${moduleId}.scratchpad`) {
-        PartyInventory.refresh();
-    }
 });

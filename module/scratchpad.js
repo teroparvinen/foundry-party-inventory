@@ -17,7 +17,8 @@ export class Scratchpad {
             id: foundry.utils.randomID(16)
         }
 
-        const scratchpad = game.settings.get(moduleId, 'scratchpad') || {};
+        let scratchpad = game.settings.get(moduleId, 'scratchpad') || {};
+        if (scratchpad instanceof String || typeof scratchpad != 'object' || Array.isArray(scratchpad)) { scratchpad = {}; }
         if (!scratchpad.items || typeof(scratchpad.items) != 'object' || Array.isArray(scratchpad.items)) { scratchpad.items = {}; }
         if (!scratchpad.order || typeof(scratchpad.order) != 'object' || !Array.isArray(scratchpad.order)) { scratchpad.order = []; }
 
@@ -38,10 +39,12 @@ export class Scratchpad {
     static deleteItem(itemId) {
         const scratchpad = game.settings.get(moduleId, 'scratchpad');
 
-        delete scratchpad.items[itemId];
-        scratchpad.order = scratchpad.order.filter(id => id !== itemId);
-
-        game.settings.set(moduleId, 'scratchpad', scratchpad);
+        if (scratchpad.items[itemId]) {
+            delete scratchpad.items[itemId];
+            scratchpad.order = scratchpad.order.filter(id => id !== itemId);
+    
+            game.settings.set(moduleId, 'scratchpad', scratchpad);
+        }
     }
 
     static requestCreate(itemData) {
