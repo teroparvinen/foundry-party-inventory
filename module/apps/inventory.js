@@ -289,12 +289,17 @@ export class PartyInventory extends FormApplication {
     _onDragStart(event) {
         const li = $(event.currentTarget);
         const itemId = li.data("item-id");
-        const item = Scratchpad.getItem(itemId)
+        const item = Scratchpad.getItem(itemId);
+
+        const quantityInfo = this.detectQuantity(item.name);
 
         let data = {
             type: item.type,
-            name: item.name,
+            name: quantityInfo.name,
             img: item.img,
+            data: {
+                quantity: quantityInfo.quantity
+            },
             flags: {
                 [moduleId]: {
                     scratchpadId: itemId
@@ -326,12 +331,17 @@ export class PartyInventory extends FormApplication {
         const dataStr = event.dataTransfer.getData('text/plain');
         const data = JSON.parse(dataStr);
 
-        if (data.type !== 'Item' || data.data?.flags?.[moduleId]?.scratchpadId) { return false; }
+        const scratchpadId = data.data?.flags?.[moduleId]?.scratchpadId;
+        const onScratchpad = !!Scratchpad.items.find(i => i.id === scratchpadId)
+
+        if (data.type !== 'Item' || onScratchpad) { return false; }
 
         function createFromData(data) {
+            const name = `${data.data.quantity} ${data.name}`;
+
             Scratchpad.requestCreate({
                 type: data.type,
-                name: data.name,
+                name: name,
                 img: data.img,
                 sourceData: data
             });
@@ -339,6 +349,15 @@ export class PartyInventory extends FormApplication {
 
         if (data.data) {
             createFromData(data.data);
+
+            if (data.actorId && game.settings.get(moduleId, 'deleteActorItemOnDrag')) {
+                const actor = game.actors.get(data.actorId);
+                if (actor.isOwner) {
+                    const item = actor.items.get(data.data._id);
+                    item.delete();
+                }
+            }
+
             return true;
         } else if (data.pack && data.id) {
             const pack = game.packs.get(data.pack);

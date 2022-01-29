@@ -23,6 +23,8 @@
         "split-currency": "Split currency among party",
         "setting-control-group": "Add Icon to Control Group",
         "setting-currency-notifications": "Show Currency Pickup Notifications",
+        "setting-delete-actor-item-on-drag": "Delete character items on drag",
+        "setting-delete-actor-item-on-drag-hint": "If this is selected, items dragged onto the party inventory scratchpad from a character's inventory are deleted from the character",
         "token-group": "Tokens",
         "notes-group": "Notes",
         "took-currency-notification": "{name} took {currency} from the party inventory"

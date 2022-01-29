@@ -49,6 +49,14 @@ Hooks.on('setup', () => {
         type: Boolean,
         default: true
     });
+    game.settings.register(moduleId, 'deleteActorItemOnDrag', {
+        name: `${localizationID}.setting-delete-actor-item-on-drag`,
+        hint: `${localizationID}.setting-delete-actor-item-on-drag-hint`,
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true
+    });
 });
 
 Hooks.on('renderActorSheet5eCharacter', (sheet, html, character) => {
