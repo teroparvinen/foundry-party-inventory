@@ -15,7 +15,7 @@
     align-items: center;
 }
 
-.scratchpad .item-delete {
+.scratchpad .item-delete, .scratchpad .item-split {
     padding: 5px;
 }
 
@@ -31,13 +31,81 @@
     flex: 0 0 120px !important;
 }
 
-.scratchpad .description-container {
-    padding-left: 35px;
-}
-
 .scratchpad textarea {
     font-family: "Signika", serif;
     font-size: 13px;
     border: 1px solid #c9c7b8;
     resize: none;
+}
+
+.party-inventory__description-container {
+    padding-left: 35px;
+}
+
+.party-inventory__footnote {
+    padding-left: 40px;
+    padding-bottom: 3px;
+    font-size: 12px;
+}
+
+.party-inventory__currency {
+    flex: 0;
+    padding-top: 5px;
+    padding-right: 25px;
+}
+
+.party-inventory__currency-decal {
+    align-self: center;
+    text-align: center;
+    flex: 42px 0 0;
+    font-size: 18px;
+}
+
+.party-inventory__currency-row {
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.party-inventory__currency-row a {
+    background: var(--tertiary-color);
+    color: var(--background);
+    border-radius: 5px;
+    font-size: 18px;
+    line-height: 30px;
+    flex: 0 0 30px;
+    text-align: center;
+    margin-right: 2px;
+}
+
+.party-inventory__currency-entry {
+    align-items: center;
+    background: var(--faint-color);
+    border-radius: 5px;
+    padding: 0 .5rem 0 0;
+    margin-right: .5rem;
+    line-height: 30px;
+    flex: 1 0 60px;
+}
+
+.party-inventory__currency-entry input {
+    text-align: right;
+}
+
+#party-inventory-take-currency input, #party-inventory-split-currency input {
+    background: none;
+    border: 1px solid transparent;
+}
+
+#party-inventory-take-currency button {
+    margin-top: 10px;
+}
+
+#party-inventory-split-currency .party-inventory__currency-row {
+    margin-bottom: 10px;
+}
+
+#party-inventory-split-currency .party-inventory__actor-name {
+    flex: 1 0 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

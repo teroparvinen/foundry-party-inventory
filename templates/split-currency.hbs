@@ -1,0 +1,29 @@
+<form>
+    {{#each actors}}
+        <div class="party-inventory__currency-row flexrow flex1">
+            <div class="party-inventory__actor-name">{{name}}</div>
+            <div class="party-inventory__currency-entry flexrow">
+                <input value="{{currency.pp}}" type="number" name="{{id}}.pp" data-dtype="Number" />
+                <span class="flex0">{{localize "PARTY-INVENTORY.pp"}}</span>
+            </div>
+            <div class="party-inventory__currency-entry flexrow">
+                <input value="{{currency.gp}}" type="number" name="{{id}}.gp" data-dtype="Number" />
+                <span class="flex0">{{localize "PARTY-INVENTORY.gp"}}</span>
+            </div>
+            <div class="party-inventory__currency-entry flexrow">
+                <input value="{{currency.ep}}" type="number" name="{{id}}.ep" data-dtype="Number" />
+                <span class="flex0">{{localize "PARTY-INVENTORY.ep"}}</span>
+            </div>
+            <div class="party-inventory__currency-entry flexrow">
+                <input value="{{currency.sp}}" type="number" name="{{id}}.sp" data-dtype="Number" />
+                <span class="flex0">{{localize "PARTY-INVENTORY.sp"}}</span>
+            </div>
+            <div class="party-inventory__currency-entry flexrow">
+                <input value="{{currency.cp}}" type="number" name="{{id}}.cp" data-dtype="Number" />
+                <span class="flex0">{{localize "PARTY-INVENTORY.cp"}}</span>
+            </div>
+        </div>
+    {{/each}}
+
+    <button class="flex0" type="submit" name="submit"><i class="fas fa-hands-helping"></i> {{localize "PARTY-INVENTORY.split-currency"}}</button>
+</form>

@@ -1,6 +1,9 @@
 import { moduleId } from './const.js';
+import { Mutex } from './dependencies/semaphore.js';
 
 export class Scratchpad {
+    static mutex = new Mutex();
+
     static get items() {
         const scratchpad = game.settings.get(moduleId, 'scratchpad');
         return scratchpad.order?.map(id => scratchpad.items[id]) || [];
@@ -12,39 +15,47 @@ export class Scratchpad {
     }
 
     static createItem(itemData) {
-        const newItem = {
-            ...itemData,
-            id: foundry.utils.randomID(16)
-        }
-
-        let scratchpad = game.settings.get(moduleId, 'scratchpad') || {};
-        if (scratchpad instanceof String || typeof scratchpad != 'object' || Array.isArray(scratchpad)) { scratchpad = {}; }
-        if (!scratchpad.items || typeof(scratchpad.items) != 'object' || Array.isArray(scratchpad.items)) { scratchpad.items = {}; }
-        if (!scratchpad.order || typeof(scratchpad.order) != 'object' || !Array.isArray(scratchpad.order)) { scratchpad.order = []; }
-
-        scratchpad.items[newItem.id] = newItem;
-        scratchpad.order.push(newItem.id);
-
-        game.settings.set(moduleId, 'scratchpad', scratchpad);
+        this.mutex.acquire().then(async release => {
+            const newItem = {
+                ...itemData,
+                id: foundry.utils.randomID(16)
+            }
+    
+            let scratchpad = game.settings.get(moduleId, 'scratchpad') || {};
+            if (scratchpad instanceof String || typeof scratchpad != 'object' || Array.isArray(scratchpad)) { scratchpad = {}; }
+            if (!scratchpad.items || typeof(scratchpad.items) != 'object' || Array.isArray(scratchpad.items)) { scratchpad.items = {}; }
+            if (!scratchpad.order || typeof(scratchpad.order) != 'object' || !Array.isArray(scratchpad.order)) { scratchpad.order = []; }
+    
+            scratchpad.items[newItem.id] = newItem;
+            scratchpad.order.push(newItem.id);
+    
+            await game.settings.set(moduleId, 'scratchpad', scratchpad);
+            release();
+        });
     }
 
     static updateItem(itemId, itemData) {
-        const scratchpad = game.settings.get(moduleId, 'scratchpad');
-
-        scratchpad.items[itemId] = foundry.utils.mergeObject(scratchpad.items[itemId] || {}, itemData);
-
-        game.settings.set(moduleId, 'scratchpad', scratchpad);
+        this.mutex.acquire().then(async release => {
+            const scratchpad = game.settings.get(moduleId, 'scratchpad');
+            scratchpad.items[itemId] = foundry.utils.mergeObject(scratchpad.items[itemId] || {}, itemData);
+            await game.settings.set(moduleId, 'scratchpad', scratchpad);
+            release();
+        });
     }
 
     static deleteItem(itemId) {
-        const scratchpad = game.settings.get(moduleId, 'scratchpad');
-
-        if (scratchpad.items[itemId]) {
-            delete scratchpad.items[itemId];
-            scratchpad.order = scratchpad.order.filter(id => id !== itemId);
-    
-            game.settings.set(moduleId, 'scratchpad', scratchpad);
-        }
+        this.mutex.acquire().then(async release => {
+            const scratchpad = game.settings.get(moduleId, 'scratchpad');
+            if (scratchpad.items[itemId]) {
+                delete scratchpad.items[itemId];
+                scratchpad.order = scratchpad.order.filter(id => id !== itemId);
+        
+                await game.settings.set(moduleId, 'scratchpad', scratchpad);
+                release();
+            } else {
+                release();
+            }
+        });
     }
 
     static requestCreate(itemData) {

@@ -1,5 +1,8 @@
-import { moduleId, localizationID } from './const.js';
-import { Scratchpad } from './scratchpad.js';
+import { moduleId, localizationID } from '../const.js';
+import { Currency } from '../currency.js';
+import { Scratchpad } from '../scratchpad.js';
+import { SplitCurrency } from './split-currency.js';
+import { TakeCurrency } from './take-currency.js';
 
 export class PartyInventory extends FormApplication {
     static instance = null;
@@ -9,7 +12,7 @@ export class PartyInventory extends FormApplication {
 
         const overrides = {
             classes: ['dnd5e', 'sheet', 'actor'],
-            height: 400,
+            height: 480,
             width: 600,
             resizable: true,
             editable: true,
@@ -47,11 +50,65 @@ export class PartyInventory extends FormApplication {
         }
     }
 
-    static refresh() {
-        this.instance?.render();
+    static async refresh() {
+        const focus = this.instance?.element.find("input:focus, textarea:focus");
+        const focusElement = focus?.length ? focus[0] : null;
+        const focusContent = focus?.val();
+
+        await this.instance?.render();
+
+        if (focusElement && focusElement.name) {
+            setTimeout(() => { 
+                const input = this.instance?.form[focusElement.name];
+                $(input).val(focusContent);
+                $(input).trigger('change');
+                if (input && (input.focus instanceof Function)) input.focus();
+            }, 0);
+        }
     }
 
     _items = null;
+
+    detectQuantity(input) {
+        if (input) {
+            const re =/(?:(\d+)\s+)?(.+?)(?:\s+\((\d+)\)|$)/;
+            const matches = input.match(re);
+
+            if (matches) {
+                if (matches[1]) {
+                    return { name: matches[2], quantity: matches[1], style: 'prefix' };
+                } else if (matches[3]) {
+                    return { name: matches[2], quantity: matches[3], style: 'suffix' };
+                }
+            }
+        }
+
+        return { name: input, quantity: 1 };
+    }
+
+    splitItem(input) {
+        const source = this.detectQuantity(input);
+
+        const makeName = (name, quantity, style) => {
+            if (quantity > 1) {
+                if (style == 'suffix') {
+                    return `${name} (${quantity})`;
+                } else {
+                    return `${quantity} ${name}`;
+                }
+            }
+            return name;
+        }
+
+        if (source.style) {
+            return {
+                source: makeName(source.name, Math.ceil(source.quantity / 2), source.style),
+                target: makeName(source.name, Math.floor(source.quantity / 2), source.style)
+            }
+        }
+
+        return null;
+    }
 
     getData(options) {
         const items = game
@@ -69,21 +126,36 @@ export class PartyInventory extends FormApplication {
 
         const typeLabels = CONFIG.Item.typeLabels;
 
-        const scratchpadItems = Scratchpad.items;
+        const scratchpadItems = foundry.utils.deepClone(Scratchpad.items);
+        scratchpadItems.forEach(i => {
+            const qr = this.detectQuantity(i.name);
+            if (qr.quantity > 1) {
+                i.quantity = qr.quantity;
+            }
 
-        return { items, typeLabels, scratchpadItems };
+            if (qr.quantity > 1 || i.sourceData) {
+                i.hasFootnote = true;
+            }
+        })
+
+        const currency = Currency.values;
+        const isGM = game.user.isGM;
+
+        return { items, typeLabels, scratchpadItems, currency, isGM };
     }
 
     async _updateObject(event, formData) {
-        const data = foundry.utils.expandObject(formData);
+        const { scratchpad, currency } = foundry.utils.expandObject(formData);
 
-        for (let id in data) {
+        for (let id in scratchpad) {
             const existing = Scratchpad.getItem(id);
-            const diff = foundry.utils.diffObject(existing, data[id]);
+            const diff = foundry.utils.diffObject(existing, scratchpad[id]);
             if (!foundry.utils.isObjectEmpty(diff)) {
                 Scratchpad.requestUpdate(id, diff);
             }
         }
+
+        Currency.requestUpdate(currency);
     }
 
     activateListeners(html) {
@@ -93,7 +165,7 @@ export class PartyInventory extends FormApplication {
         html.find('h4').on('click', this._onItemSummary.bind(this));
 
         // Button handling
-        html.on('click', "[data-action]", this._handleButtonClick);
+        html.on('click', "[data-action]", this._handleButtonClick.bind(this));
 
         // Image browsing
         html.find('img[data-edit]').click(ev => this._onEditImage(ev));
@@ -160,6 +232,28 @@ export class PartyInventory extends FormApplication {
                 break;
             case 'delete':
                 Scratchpad.requestDelete(itemId);
+                break;
+            case 'split':
+                const item = Scratchpad.getItem(itemId);
+                const split = this.splitItem(item.name);
+                if (split) {
+                    Scratchpad.requestUpdate(itemId, { name: split.source });
+                    Scratchpad.requestCreate({
+                        img: item.img,
+                        name: split.target,
+                        description: item.description,
+                        type: item.type,
+                        sourceData: item.sourceData
+                    });
+                }
+                break;
+            case 'take-currency':
+                const takeApp = new TakeCurrency();
+                takeApp.render(true);
+                break;
+            case 'split-currency':
+                const splitApp = new SplitCurrency();
+                splitApp.render(true);
                 break;
         }
     }

@@ -7,8 +7,24 @@
         "is-in-party-inventory": "In Party Inventory",
         "add-new": "Add New Scratchpad Entry",
         "delete-item": "Delete item",
+        "split-item": "Split into two",
         "name-placeholder": "New item",
         "description-placeholder": "Description",
-        "scratchpad-title": "Scratchpad"
+        "scratchpad-title": "Scratchpad",
+        "item-quantity": "Quantity",
+        "item-has-source-data": "Has additional game data",
+        "item-has-custom-description": ", using given description",
+        "pp": "PP",
+        "gp": "GP",
+        "ep": "EP",
+        "sp": "SP",
+        "cp": "CP",
+        "take-currency": "Take currency",
+        "split-currency": "Split currency among party",
+        "setting-control-group": "Add Icon to Control Group",
+        "setting-currency-notifications": "Show Currency Pickup Notifications",
+        "token-group": "Tokens",
+        "notes-group": "Notes",
+        "took-currency-notification": "{name} took {currency} from the party inventory"
     }
 }
