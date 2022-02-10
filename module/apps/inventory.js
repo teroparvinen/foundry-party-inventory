@@ -337,7 +337,7 @@ export class PartyInventory extends FormApplication {
         if (data.type !== 'Item' || onScratchpad) { return false; }
 
         function createFromData(data) {
-            const name = `${data.data.quantity} ${data.name}`;
+            const name = data.data.quantity > 1 ? `${data.data.quantity} ${data.name}` : data.name;
 
             Scratchpad.requestCreate({
                 type: data.type,

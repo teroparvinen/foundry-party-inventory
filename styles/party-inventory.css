@@ -104,8 +104,19 @@
     margin-bottom: 10px;
 }
 
+#party-inventory-split-currency .party-inventory__actor-included {
+    flex-basis: 30px;
+}
+
 #party-inventory-split-currency .party-inventory__actor-name {
     flex: 1 0 100px;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+#party-inventory-split-currency .party-inventory__reveal-disabled {
+    text-align: right;
+    margin-bottom: 5px;
+    font-size: 12px;
+    color: var(--color-text-dark-5);
 }

@@ -1,6 +1,7 @@
 import { moduleId, localizationID } from './const.js';
 import { addTogglePartyButton, addTogglePartyButtonTidy, addGroupInventoryIndicatorTidy } from './sheet-inject.js';
 import { PartyInventory } from './apps/inventory.js';
+import { SplitCurrency } from './apps/split-currency.js';
 
 Hooks.on('setup', () => {
     const debouncedReload = foundry.utils.debounce(() => window.location.reload(), 100);
@@ -28,6 +29,14 @@ Hooks.on('setup', () => {
         },
         onChange: value => {
             PartyInventory.refresh();
+        }
+    });
+    game.settings.register(moduleId, 'excludedActors', { 
+        scope: 'world',
+        type: Object,
+        default: [],
+        onChange: value => {
+            Object.values(ui.windows).filter(w => w instanceof SplitCurrency).forEach(w => w.render());
         }
     });
     game.settings.register(moduleId, 'controlButtonGroup', {
