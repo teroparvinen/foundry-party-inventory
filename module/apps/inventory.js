@@ -26,9 +26,6 @@ export class PartyInventory extends FormApplication {
             dragDrop: [
                 {
                     dragSelector: '.scratchpad .item',
-                },
-                {
-                	dropSelector: '.scratchpad'
                 }
             ]
         };
@@ -358,19 +355,19 @@ export class PartyInventory extends FormApplication {
                 }
             }
 
-            return true;
+            return false;
         } else if (data.pack && data.id) {
             const pack = game.packs.get(data.pack);
             if (pack.documentName == 'Item') {
                 const document = await pack.getDocument(data.id);
                 createFromData(document.data);
-                return true;
+                return false;
             }
         } else if (data.id) {
             const collection = CONFIG['Item'].collection.instance;
             const document = collection.get(data.id)
             createFromData(document.data);
-            return true;
+            return false;
         }
 
         return true;

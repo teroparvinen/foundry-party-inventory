@@ -108,3 +108,9 @@ Hooks.on('updateItem', (item) => {
 Hooks.on('deleteItem', (item) => {
     PartyInventory.refresh();
 });
+
+Hooks.on('init', () => {
+    game.modules.get(moduleId).api = {
+        openWindow: () => { PartyInventory.activate(); }
+    }
+});
