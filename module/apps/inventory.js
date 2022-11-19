@@ -73,9 +73,9 @@ export class PartyInventory extends FormApplication {
 
             if (matches) {
                 if (matches[1]) {
-                    return { name: matches[2], quantity: matches[1], style: 'prefix' };
+                    return { name: matches[2], quantity: parseInt(matches[1]), style: 'prefix' };
                 } else if (matches[3]) {
-                    return { name: matches[2], quantity: matches[3], style: 'suffix' };
+                    return { name: matches[2], quantity: parseInt(matches[3]), style: 'suffix' };
                 }
             }
         }
@@ -158,6 +158,10 @@ export class PartyInventory extends FormApplication {
     activateListeners(html) {
         super.activateListeners(html);
 
+        const self = this;
+
+        html.find('.currency-input').change(this._onChangeCurrencyDelta.bind(this));
+
         // Open summary from name
         html.find('h4').on('click', this._onItemSummary.bind(this));
 
@@ -166,10 +170,21 @@ export class PartyInventory extends FormApplication {
 
         // Image browsing
         html.find('img[data-edit]').click(ev => this._onEditImage(ev));
-        if (!game.user.can("FILES_BROWSE")) {
-            let IconPicker = game.modules.get('icon-picker')?.api;
-            if (IconPicker) {
+
+        let IconPicker = game.modules.get('icon-picker')?.api;
+        if (IconPicker) {
+            if (!game.user.can("FILES_BROWSE")) {
                 html.find('img[data-edit]').click(async function (ev) {
+                    const picker = new IconPicker();
+
+                    try {
+                        let result = await picker.pick();
+                        $(this).attr('src', result);
+                        $(this).closest('form').submit();
+                    } catch { }
+                });
+            } else {
+                html.find('img[data-edit]').on("contextmenu", async function (ev) {
                     const picker = new IconPicker();
 
                     try {
@@ -193,6 +208,28 @@ export class PartyInventory extends FormApplication {
             this.style.height = "auto";
             this.style.height = (this.scrollHeight) + "px";
         });
+
+        // Preview item with data
+        html.find(".preview-item").click(function () {
+            const itemId = this.closest('[data-item-id]').dataset.itemId;
+            const data = self._constructExportableData(itemId);
+            const item = new CONFIG.Item.documentClass(data);
+            item.testUserPermission = () => true;
+            item.update = () => {};
+            const sheet = item.sheet
+            sheet.render(true, { editable: false });
+        });
+    }
+
+    _onChangeCurrencyDelta(event) {
+        const input = event.target;
+        const value = input.value;
+        if (["+", "-"].includes(value[0])) {
+            let delta = parseFloat(value);
+            input.value = Currency.values[input.name.split('.')[1]] + delta;
+        } else if (value[0] === "=") {
+            input.value = value.slice(1);
+        }
     }
 
     _onItemSummary(event) {
@@ -220,6 +257,7 @@ export class PartyInventory extends FormApplication {
         const clickedElement = $(event.currentTarget);
         const action = clickedElement.data().action;
         const itemId = clickedElement.parents('[data-item-id]').data()?.itemId;
+        const item = Scratchpad.getItem(itemId);
 
         switch (action) {
             case 'create':
@@ -231,7 +269,6 @@ export class PartyInventory extends FormApplication {
                 Scratchpad.requestDelete(itemId);
                 break;
             case 'split':
-                const item = Scratchpad.getItem(itemId);
                 const split = this.splitItem(item.name);
                 if (split) {
                     Scratchpad.requestUpdate(itemId, { name: split.source });
@@ -241,8 +278,12 @@ export class PartyInventory extends FormApplication {
                         description: item.description,
                         type: item.type,
                         sourceData: item.sourceData
-                    });
+                    }, { after: itemId });
                 }
+                break;
+            case 'collapse':
+                item.isCollapsed = !item.isCollapsed;
+                Scratchpad.requestUpdate(itemId, item);
                 break;
             case 'take-currency':
                 const takeApp = new TakeCurrency();
@@ -283,9 +324,7 @@ export class PartyInventory extends FormApplication {
         return true;
     }
 
-    _onDragStart(event) {
-        const li = $(event.currentTarget);
-        const itemId = li.data("item-id");
+    _constructExportableData(itemId) {
         const item = Scratchpad.getItem(itemId);
 
         const quantityInfo = this.detectQuantity(item.name);
@@ -314,6 +353,14 @@ export class PartyInventory extends FormApplication {
             data = foundry.utils.mergeObject(item.sourceData, data);
         }
 
+        return data;
+    }
+
+    _onDragStart(event) {
+        const li = $(event.currentTarget);
+        const itemId = li.data("item-id");
+        const data = this._constructExportableData(itemId);
+
         event.dataTransfer.setData("text/plain", JSON.stringify({
             type: "Item",
             data: data
@@ -330,6 +377,13 @@ export class PartyInventory extends FormApplication {
 
         const scratchpadId = data.data?.flags?.[moduleId]?.scratchpadId;
         const onScratchpad = !!Scratchpad.items.find(i => i.id === scratchpadId)
+
+        // Reorder
+        if (onScratchpad) {
+            const targetId = event.target.closest('.item').dataset.itemId;
+            Scratchpad.requestReorder(scratchpadId, targetId);
+            return false;
+        }
 
         if (data.type !== 'Item' || onScratchpad) { return false; }
 

@@ -14,7 +14,7 @@ export class Scratchpad {
         return scratchpad.items[itemId];
     }
 
-    static createItem(itemData) {
+    static createItem(itemData, options = {}) {
         this.mutex.acquire().then(async release => {
             const newItem = {
                 ...itemData,
@@ -27,7 +27,13 @@ export class Scratchpad {
             if (!scratchpad.order || typeof(scratchpad.order) != 'object' || !Array.isArray(scratchpad.order)) { scratchpad.order = []; }
     
             scratchpad.items[newItem.id] = newItem;
-            scratchpad.order.push(newItem.id);
+
+            if (options.after) {
+                const insertIndex = scratchpad.order.indexOf(options.after) + 1;
+                scratchpad.order = [...scratchpad.order.slice(0, insertIndex), newItem.id, ...scratchpad.order.slice(insertIndex)];
+            } else {
+                scratchpad.order.push(newItem.id);
+            }
     
             await game.settings.set(moduleId, 'scratchpad', scratchpad);
             release();
@@ -58,13 +64,31 @@ export class Scratchpad {
         });
     }
 
-    static requestCreate(itemData) {
+    static reorderItem(movedItemId, targetItemId) {
+        this.mutex.acquire().then(async release => {
+            const scratchpad = game.settings.get(moduleId, 'scratchpad');
+            const movedItemIndex = scratchpad.order.indexOf(movedItemId);
+            const targetItemIndex = scratchpad.order.indexOf(targetItemId);
+            if (movedItemIndex >= 0 && targetItemIndex >= 0 && movedItemIndex != targetItemIndex) {
+                const filteredOrder = scratchpad.order.filter(o => o !== movedItemId);
+                const insertIndex = movedItemIndex > targetItemIndex ? filteredOrder.indexOf(targetItemId) : filteredOrder.indexOf(targetItemId) + 1;
+                if (insertIndex >= 0) {
+                    scratchpad.order = [...filteredOrder.slice(0, insertIndex), movedItemId, ...filteredOrder.slice(insertIndex)];
+                    await game.settings.set(moduleId, 'scratchpad', scratchpad);
+                }
+            }
+            release();
+        });
+    }
+
+    static requestCreate(itemData, options) {
         if (game.user.isGM) {
-            Scratchpad.createItem(itemData);
+            Scratchpad.createItem(itemData, options);
         } else {
             socket.emit(`module.${moduleId}`, {
                 type: 'create',
-                itemData: itemData
+                itemData: itemData,
+                options
             });
         }
     }
@@ -90,14 +114,25 @@ export class Scratchpad {
             });
         }
     }
+
+    static requestReorder(movedItemId, targetItemId) {
+        if (game.user.isGM) {
+            Scratchpad.reorderItem(movedItemId, targetItemId);
+        } else {
+            socket.emit(`module.${moduleId}`, {
+                type: 'reorder',
+                items: [movedItemId, targetItemId]
+            });
+        }
+    }
 }
 
 Hooks.on('setup', () => {
-    socket.on(`module.${moduleId}`, ({ type, items, itemData }) => {
+    socket.on(`module.${moduleId}`, ({ type, items, itemData, options }) => {
         if (game.user.isGM) {
             switch (type) {
                 case 'create':
-                    Scratchpad.createItem(itemData);
+                    Scratchpad.createItem(itemData, options);
                     break;
                 case 'update':
                     for (let id in items) {
@@ -106,6 +141,9 @@ Hooks.on('setup', () => {
                     break;
                 case 'delete':
                     items.forEach(id => Scratchpad.deleteItem(id));
+                    break;
+                case 'reorder':
+                    Scratchpad.reorderItem(items[0], items[1]);
                     break;
             }
         }
@@ -118,5 +156,23 @@ Hooks.on('createItem', (item) => {
         if (id) {
             Scratchpad.deleteItem(id);
         }
+    }
+});
+
+Hooks.on('setup', () => {
+    const ActorSheet5eCharacter = game.dnd5e.applications.ActorSheet5eCharacter;
+    const ActorSheet5e = Object.getPrototypeOf(ActorSheet5eCharacter);
+    const prev = ActorSheet5e.prototype._onDropStackConsumables;
+    if (prev) {
+        ActorSheet5e.prototype._onDropStackConsumables = function(itemData) {
+            const scratchpadId = itemData.flags['party-inventory']?.scratchpadId;
+            const wrappedResult = prev.apply(this, [itemData]);
+
+            if (wrappedResult && scratchpadId) {
+                Scratchpad.requestDelete(scratchpadId);
+            }
+
+            return wrappedResult;
+        };
     }
 });

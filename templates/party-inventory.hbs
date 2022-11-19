@@ -31,6 +31,15 @@
                                 <i class="fas fa-share-alt"></i>
                             </a>
                         {{/if}}
+                        {{#unless item.description}}
+                            <a class="item-control item-collapse flex0" data-action="collapse" title="{{localize "PARTY-INVENTORY.collapse-item"}}">
+                                {{#if item.isCollapsed}}
+                                    <i class="fas fa-book"></i>
+                                {{else}}
+                                    <i class="fas fa-book-open"></i>
+                                {{/if}}
+                            </a>
+                        {{/unless}}
                         <select class="item-type-select" name="scratchpad.{{id}}.type" data-dtype="String">
                             {{selectOptions ../typeLabels selected=type localize=true}}
                         </select>
@@ -38,20 +47,29 @@
                             <i class="fas fa-trash"></i>
                         </a>
                     </div>
-                    <div class="party-inventory__description-container">
-                        <textarea class="item-description" name="scratchpad.{{item.id}}.description" placeholder="{{localize "PARTY-INVENTORY.description-placeholder"}}">{{item.description}}</textarea>
-                    </div>
+                    {{#if (or item.description (not item.isCollapsed))}}
+                        <div class="party-inventory__description-container">
+                            <textarea class="item-description" name="scratchpad.{{item.id}}.description" placeholder="{{localize "PARTY-INVENTORY.description-placeholder"}}">{{item.description}}</textarea>
+                        </div>
+                    {{/if}}
                     {{#if item.hasFootnote}}
-                        <div class="party-inventory__footnote">
+                        <div class="party-inventory__footnote flexrow">
                             {{#if item.quantity}}
-                                {{localize "PARTY-INVENTORY.item-quantity"}}: {{item.quantity}}
+                                <div class="party-inventory__footnote-quantity flex0">
+                                    {{localize "PARTY-INVENTORY.item-quantity"}}: {{item.quantity}}
+                                </div>
                             {{/if}}
 
                             {{#if item.sourceData}}
-                                {{localize "PARTY-INVENTORY.item-has-source-data"~}}
-                                {{#if item.description}}
-                                    {{~localize "PARTY-INVENTORY.item-has-custom-description"}}
-                                {{/if}}
+                                <div class="party-inventory__footnote-data flex0">
+                                    <a class="preview-item">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                    {{localize "PARTY-INVENTORY.item-has-source-data"~}}
+                                    {{#if item.description}}
+                                        {{~localize "PARTY-INVENTORY.item-has-custom-description"}}
+                                    {{/if}}
+                                </div>
                             {{/if}}
                         </div>
                     {{/if}}
@@ -66,23 +84,23 @@
         <i class="party-inventory__currency-decal fas fa-coins"></i>
         <div class="party-inventory__currency-row flexrow">
             <div class="party-inventory__currency-entry flexrow">
-                <input value="{{currency.pp}}" type="number" name="currency.pp" data-dtype="Number" />
+                <input class="currency-input" value="{{currency.pp}}" type="text" name="currency.pp" data-dtype="Number" />
                 <span class="flex0">{{localize "PARTY-INVENTORY.pp"}}</span>
             </div>
             <div class="party-inventory__currency-entry flexrow">
-                <input value="{{currency.gp}}" type="number" name="currency.gp" data-dtype="Number" />
+                <input class="currency-input" value="{{currency.gp}}" type="text" name="currency.gp" data-dtype="Number" />
                 <span class="flex0">{{localize "PARTY-INVENTORY.gp"}}</span>
             </div>
             <div class="party-inventory__currency-entry flexrow">
-                <input value="{{currency.ep}}" type="number" name="currency.ep" data-dtype="Number" />
+                <input class="currency-input" value="{{currency.ep}}" type="text" name="currency.ep" data-dtype="Number" />
                 <span class="flex0">{{localize "PARTY-INVENTORY.ep"}}</span>
             </div>
             <div class="party-inventory__currency-entry flexrow">
-                <input value="{{currency.sp}}" type="number" name="currency.sp" data-dtype="Number" />
+                <input class="currency-input" value="{{currency.sp}}" type="text" name="currency.sp" data-dtype="Number" />
                 <span class="flex0">{{localize "PARTY-INVENTORY.sp"}}</span>
             </div>
             <div class="party-inventory__currency-entry flexrow">
-                <input value="{{currency.cp}}" type="number" name="currency.cp" data-dtype="Number" />
+                <input class="currency-input" value="{{currency.cp}}" type="text" name="currency.cp" data-dtype="Number" />
                 <span class="flex0">{{localize "PARTY-INVENTORY.cp"}}</span>
             </div>
             {{#unless isGM}}

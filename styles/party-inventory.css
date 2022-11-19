@@ -15,8 +15,12 @@
     align-items: center;
 }
 
-.scratchpad .item-delete, .scratchpad .item-split {
+.scratchpad .item-delete, .scratchpad .item-split, .scratchpad .item-collapse {
     padding: 5px;
+}
+
+.scratchpad .item-split + .item-collapse {
+    padding: 5px 5px 5px 0;
 }
 
 .scratchpad .item-name {
@@ -46,6 +50,11 @@
     padding-left: 40px;
     padding-bottom: 3px;
     font-size: 12px;
+}
+
+.party-inventory__footnote > * {
+    margin-right: 15px;
+    white-space: nowrap;
 }
 
 .party-inventory__currency {

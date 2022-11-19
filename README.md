@@ -57,6 +57,12 @@ Technically, modifying the scratchpad requires message passing to a Gamemaster u
 - [Give Item](https://github.com/Sepichat/FoundryVTT-GiveItem) by Sepichat for exchanging items between characters
 - [Icon Picker](https://github.com/teroparvinen/foundry-icon-picker) for allowing players to pick icons for items
 
+## Macro API
+
+The module exposes an API for opening the window from a macro:
+
+`game.modules.get('party-inventory').api.openWindow()`
+
 ## License
 
 This Foundry VTT module, written by Tero Parvinen, is licensed under a Creative Commons Attribution 4.0 International License.

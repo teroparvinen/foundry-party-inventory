@@ -58,26 +58,24 @@ export class SplitCurrency extends FormApplication {
         const actors = actorInfo.filter(i => i.isIncluded).map(i => i.actor);
         const nonSplittingActors = actorInfo.filter(i => !i.isIncluded).map(i => i.actor);
 
-        if (actors.length) {
-            const stash = Currency.values;
+        const stash = Currency.values;
 
-            const values = {};
-            for (let currency in stash) {
-                values[currency] = Math.floor(stash[currency] / actors.length);
-            }
-    
-            return { 
-                actors: actors.map(a => {
-                    return {
-                        name: a.name,
-                        id: a.id,
-                        currency: { ...values }
-                    }
-                }),
-                nonSplittingActors,
-                showNonSplitting: this.showNonSplitting
-            };
+        const values = {};
+        for (let currency in stash) {
+            values[currency] = Math.floor(stash[currency] / actors.length);
         }
+
+        return { 
+            actors: actors.map(a => {
+                return {
+                    name: a.name,
+                    id: a.id,
+                    currency: { ...values }
+                }
+            }),
+            nonSplittingActors,
+            showNonSplitting: this.showNonSplitting
+        };
     }
 
 }

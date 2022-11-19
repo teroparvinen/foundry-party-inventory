@@ -29,7 +29,7 @@
     {{#each actors as |actor|}}
         {{> actor-row actor=actor isEnabled=true}}
     {{/each}}
-    {{#if (and (not showNonSplitting) nonSplittingActors.length)}}
+    {{#if (and (not showNonSplitting) (or nonSplittingActors.length (and nonSplittingActors.length (not actors.length))))}}
         <div class="party-inventory__reveal-disabled">
             <a data-action="reveal-disabled">{{localize "PARTY-INVENTORY.reveal-disabled" count=nonSplittingActors.length}}</a>
         </div>
