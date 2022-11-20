@@ -38,7 +38,7 @@ export class Currency {
         if (game.user.isGM) {
             Currency.values = currency;
         } else {
-            socket.emit(`module.${moduleId}`, {
+            game.socket.emit(`module.${moduleId}`, {
                 type: 'update-currency',
                 transfer: currency
             });
@@ -49,7 +49,7 @@ export class Currency {
         if (game.user.isGM) {
             this.handleTransfer({ currency, actorId });
         } else {
-            socket.emit(`module.${moduleId}`, {
+            game.socket.emit(`module.${moduleId}`, {
                 type: 'transfer-currency',
                 transfer: {
                     currency,
@@ -63,7 +63,7 @@ export class Currency {
         if (game.user.isGM) {
             this.updateActorState(actorId, state);
         } else {
-            socket.emit(`module.${moduleId}`, {
+            game.socket.emit(`module.${moduleId}`, {
                 type: 'update-actor-state',
                 transfer: {
                     actorId,
@@ -76,7 +76,7 @@ export class Currency {
     static handleTransfer(transfer) {
         this.mutex.acquire().then(async release => {
             const actor = game.actors.get(transfer.actorId);
-            const currentCurrency = actor.data.data.currency;
+            const currentCurrency = actor.system.currency;
             const transferCurrency = transfer.currency;
             const actorUpdate = {};
             const partyCurrency = this.values;
@@ -99,7 +99,7 @@ export class Currency {
                         name: actor.name,
                         currency: message.join(', ')
                     })
-                    socket.emit(`module.${moduleId}`, {
+                    game.socket.emit(`module.${moduleId}`, {
                         type: 'notify-transfer',
                         transfer: notificationMessage
                     });
@@ -113,7 +113,7 @@ export class Currency {
 }
 
 Hooks.on('setup', () => {
-    socket.on(`module.${moduleId}`, ({ type, transfer }) => {
+    game.socket.on(`module.${moduleId}`, ({ type, transfer }) => {
         if (game.user.isGM) {
             switch (type) {
                 case 'update-currency':

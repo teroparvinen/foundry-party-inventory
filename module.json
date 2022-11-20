@@ -1,5 +1,5 @@
 {
-    "name": "party-inventory",
+    "id": "party-inventory",
     "title": "Party Inventory",
     "description": "Shows items carried by characters flagged as Party Loot in one list.",
     "authors": [
@@ -7,10 +7,17 @@
             "name": "Tero Parvinen"
         }
     ],
-    "version": "1.6",
-    "minimumCoreVersion": "9",
-    "compatibleCoreVersion": "9",
-    "system": ["dnd5e"],
+    "version": "10.1",
+    "compatibility": {
+        "minimum": 10,
+        "verified": 10
+    },
+    "relationships": {
+        "systems": [{
+            "id": "dnd5e",
+            "type": "system"
+        }]
+    },
     "esmodules": [
         "./module/party-inventory.js"
     ],

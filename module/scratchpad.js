@@ -85,7 +85,7 @@ export class Scratchpad {
         if (game.user.isGM) {
             Scratchpad.createItem(itemData, options);
         } else {
-            socket.emit(`module.${moduleId}`, {
+            game.socket.emit(`module.${moduleId}`, {
                 type: 'create',
                 itemData: itemData,
                 options
@@ -97,7 +97,7 @@ export class Scratchpad {
         if (game.user.isGM) {
             Scratchpad.updateItem(itemId, itemData);
         } else {
-            socket.emit(`module.${moduleId}`, {
+            game.socket.emit(`module.${moduleId}`, {
                 type: 'update',
                 items: { [itemId]: itemData }
             });
@@ -108,7 +108,7 @@ export class Scratchpad {
         if (game.user.isGM) {
             Scratchpad.deleteItem(itemId);
         } else {
-            socket.emit(`module.${moduleId}`, {
+            game.socket.emit(`module.${moduleId}`, {
                 type: 'delete',
                 items: [itemId]
             });
@@ -119,7 +119,7 @@ export class Scratchpad {
         if (game.user.isGM) {
             Scratchpad.reorderItem(movedItemId, targetItemId);
         } else {
-            socket.emit(`module.${moduleId}`, {
+            game.socket.emit(`module.${moduleId}`, {
                 type: 'reorder',
                 items: [movedItemId, targetItemId]
             });
@@ -128,7 +128,7 @@ export class Scratchpad {
 }
 
 Hooks.on('setup', () => {
-    socket.on(`module.${moduleId}`, ({ type, items, itemData, options }) => {
+    game.socket.on(`module.${moduleId}`, ({ type, items, itemData, options }) => {
         if (game.user.isGM) {
             switch (type) {
                 case 'create':
@@ -160,7 +160,7 @@ Hooks.on('createItem', (item) => {
 });
 
 Hooks.on('setup', () => {
-    const ActorSheet5eCharacter = game.dnd5e.applications.ActorSheet5eCharacter;
+    const ActorSheet5eCharacter = game.dnd5e.applications.actor.ActorSheet5eCharacter;
     const ActorSheet5e = Object.getPrototypeOf(ActorSheet5eCharacter);
     const prev = ActorSheet5e.prototype._onDropStackConsumables;
     if (prev) {

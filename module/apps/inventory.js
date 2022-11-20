@@ -118,7 +118,7 @@ export class PartyInventory extends FormApplication {
 
         this._items = items;
 
-        items.forEach(i => { i.isStack = i.data.data.quantity > 1 });
+        items.forEach(i => { i.isStack = i.system.quantity > 1 });
         items.forEach(i => { i.charName = i.actor.name.split(' ')[0] });
 
         const typeLabels = CONFIG.Item.typeLabels;
@@ -147,7 +147,7 @@ export class PartyInventory extends FormApplication {
         for (let id in scratchpad) {
             const existing = Scratchpad.getItem(id);
             const diff = foundry.utils.diffObject(existing, scratchpad[id]);
-            if (!foundry.utils.isObjectEmpty(diff)) {
+            if (!foundry.utils.isEmpty(diff)) {
                 Scratchpad.requestUpdate(id, diff);
             }
         }
@@ -333,7 +333,7 @@ export class PartyInventory extends FormApplication {
             type: item.type,
             name: quantityInfo.name,
             img: item.img,
-            data: {
+            system: {
                 quantity: quantityInfo.quantity
             },
             flags: {
@@ -373,55 +373,58 @@ export class PartyInventory extends FormApplication {
 
     async _onDrop(event) {
         const dataStr = event.dataTransfer.getData('text/plain');
-        const data = JSON.parse(dataStr);
-
-        const scratchpadId = data.data?.flags?.[moduleId]?.scratchpadId;
-        const onScratchpad = !!Scratchpad.items.find(i => i.id === scratchpadId)
-
-        // Reorder
-        if (onScratchpad) {
-            const targetId = event.target.closest('.item').dataset.itemId;
-            Scratchpad.requestReorder(scratchpadId, targetId);
-            return false;
-        }
-
-        if (data.type !== 'Item' || onScratchpad) { return false; }
+        const dragData = JSON.parse(dataStr);
 
         function createFromData(data) {
-            const name = data.data.quantity > 1 ? `${data.data.quantity} ${data.name}` : data.name;
+            const name = data.system.quantity > 1 ? `${data.system.quantity} ${data.name}` : data.name;
 
             Scratchpad.requestCreate({
                 type: data.type,
                 name: name,
                 img: data.img,
-                sourceData: data
+                sourceData: duplicate(data)
             });
         }
 
-        if (data.data) {
-            createFromData(data.data);
-
-            if (data.actorId && game.settings.get(moduleId, 'deleteActorItemOnDrag')) {
-                const actor = game.actors.get(data.actorId);
-                if (actor.isOwner) {
-                    const item = actor.items.get(data.data._id);
-                    item.delete();
+        if (dragData.data) {
+            const itemData = dragData.data;
+            const scratchpadId = itemData.flags?.[moduleId]?.scratchpadId;
+            const onScratchpad = !!Scratchpad.items.find(i => i.id === scratchpadId)
+    
+            // Reorder
+            if (onScratchpad) {
+                const targetId = event.target.closest('.item')?.dataset?.itemId;
+                if (targetId) {
+                    Scratchpad.requestReorder(scratchpadId, targetId);
                 }
-            }
-
-            return false;
-        } else if (data.pack && data.id) {
-            const pack = game.packs.get(data.pack);
-            if (pack.documentName == 'Item') {
-                const document = await pack.getDocument(data.id);
-                createFromData(document.data);
                 return false;
             }
-        } else if (data.id) {
-            const collection = CONFIG['Item'].collection.instance;
-            const document = collection.get(data.id)
-            createFromData(document.data);
+    
+            createFromData(itemData);
             return false;
+        } else if (dragData.uuid) {
+            const item = fromUuidSync(dragData.uuid);
+
+            if (dragData.type !== 'Item') { return false; }
+    
+            if (item.pack && item._id) {
+                const pack = game.packs.get(item.pack);
+                if (pack.documentName == 'Item') {
+                    const packItem = await pack.getDocument(item._id);
+                    createFromData(packItem._source);
+                    return false;
+                }
+            } else if (item.system) {
+                createFromData(item._source);
+    
+                if (item.actor && game.settings.get(moduleId, 'deleteActorItemOnDrag')) {
+                    if (item.actor.isOwner) {
+                        item.delete();
+                    }
+                }
+    
+                return false;
+            }
         }
 
         return true;
