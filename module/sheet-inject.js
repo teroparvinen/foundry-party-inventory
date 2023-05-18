@@ -4,7 +4,7 @@ export function addTogglePartyButton(html, actor) {
     const enableTitle = game.i18n.localize(`${localizationID}.enable-item-title`);
     const disableTitle = game.i18n.localize(`${localizationID}.disable-item-title`);
 
-    html.find(".inventory ol:not(.currency-list)  .item-control.item-edit").each(function() {
+    html.find(".inventory ol:not(.currency-list)  .item-control.item-edit, .itemcollection-details ol:not(.currency-list) .item-control.item-edit").each(function() {
         const currentItemId = this.closest(".item").dataset.itemId;
         const currentItem = actor.items.find(item => item.id === currentItemId);
         const isInPartyInventory = currentItem.getFlag(moduleId, 'inPartyInventory');

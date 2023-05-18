@@ -107,19 +107,48 @@ export class PartyInventory extends FormApplication {
         return null;
     }
 
+    getActorForChildItem(item)
+    {
+      if (item.actor != null)
+        return item.actor;
+      if (item.parent)
+      {
+        return this.getActorForChildItem(item.parent);
+      }
+      console.log("No parent and no actor found for item",item);
+      return null;
+    }
+
+    getItemsFromItems(items)
+    {
+      let newItems = [];
+      for (let item of items)
+      {
+        newItems.push(item);
+        if (item.system.constructor.name == 'ContainerData')
+        {
+          let containerItems = item.items.contents;
+          containerItems = this.getItemsFromItems(containerItems);
+          newItems = newItems.concat(containerItems);
+        }
+      }
+      return newItems;
+    }
+
     getData(options) {
-        const items = game
+        let items = game
             .actors
-                .filter(a => a.hasPlayerOwner)
-            .flatMap(a => a.items.contents)
-            .filter(i => i.getFlag(moduleId, 'inPartyInventory'))
+            .filter(a => a.hasPlayerOwner)
+            .flatMap(a => a.items.contents);
+        items = this.getItemsFromItems(items);
+        items = items.filter(i => i.getFlag(moduleId, 'inPartyInventory'));
 
         items.sort((a, b) => a.name.localeCompare(b.name));
 
         this._items = items;
 
         items.forEach(i => { i.isStack = i.system.quantity > 1 });
-        items.forEach(i => { i.charName = i.actor.name.split(' ')[0] });
+        items.forEach(i => { i.charName = this.getActorForChildItem(i)?.name.split(' ')[0] });
 
         const typeLabels = CONFIG.Item.typeLabels;
 
