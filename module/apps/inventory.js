@@ -232,11 +232,11 @@ export class PartyInventory extends FormApplication {
         }
     }
 
-    _onItemSummary(event) {
+    async _onItemSummary(event) {
         event.preventDefault();
         const li = $(event.currentTarget).parents(".item");
         const item = this._items.find(i => i.id == li.data("item-id"));
-        const chatData = item.getChatData();
+        const chatData = await item.getChatData();
 
         // Toggle summary
         if (li.hasClass("expanded")) {
@@ -373,6 +373,7 @@ export class PartyInventory extends FormApplication {
 
     async _onDrop(event) {
         const dataStr = event.dataTransfer.getData('text/plain');
+        if (!dataStr || dataStr === "") { return false; }
         const dragData = JSON.parse(dataStr);
 
         function createFromData(data) {

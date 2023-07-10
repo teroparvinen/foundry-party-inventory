@@ -2,13 +2,34 @@
     flex: 0 0 86px !important;
 }
 
+#party-inventory {
+    min-width: 450px;
+    min-height: 300px;
+}
+
 #party-inventory .item-owner-name {
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.scratchpad {
-    padding: 0 5px;
+#party-inventory .item-section {
+    margin-bottom: 6px;
+    padding: 3px;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+#party-inventory .item-section p {
+    margin: 6px 3px;
+    color: var(--color-text-dark-secondary);
+    font-size: 14px;
+}
+
+#party-inventory .item-section ul {
+    background: url(/ui/parchment.jpg);
+    border-radius: 4px;
+    padding: 5px;
+    margin: 0;
 }
 
 .scratchpad .item-row {
@@ -76,8 +97,8 @@
 }
 
 .party-inventory__currency-row a {
-    background: var(--tertiary-color);
-    color: var(--background);
+    background: rgba(0,0,0,.4);
+    color: rgba(236,233,223,1);
     border-radius: 5px;
     font-size: 18px;
     line-height: 30px;
@@ -88,7 +109,7 @@
 
 .party-inventory__currency-entry {
     align-items: center;
-    background: var(--faint-color);
+    background: rgba(0, 0, 0, 0.1);
     border-radius: 5px;
     padding: 0 .5rem 0 0;
     margin-right: .5rem;

@@ -1,81 +1,86 @@
 <form class="flexcol">
     <div class="items-list">
-        <ul class="inventory-list">
-            {{#each items as |item|}}
-                <li class="item flexrow" data-item-id="{{item.id}}" draggable="true">
-                    <div class="item-name flexrow">
-                        <div class="item-image" tabindex="0" role="button" aria-label="{{item.name}}" style="background-image: url('{{item.img}}')"></div>
-                        <h4>
-                            {{item.name~}}
-                            {{~#if item.isStack}} ({{item.system.quantity}}){{/if}}
-                        </h4>
-                    </div>
-                    <div class="item-detail item-owner-name">
-                        {{item.charName}}
-                    </div>
-                </li>
-            {{/each}}
-        </ul>
-
-        <p>{{localize "PARTY-INVENTORY.scratchpad-title"}}</p>
-        <ul class="scratchpad">
-            {{#each scratchpadItems as |item|}}
-                <li class="item" data-item-id={{item.id}}>
-                    <div class="item-row flexrow">
+        <div class="item-section">
+            <p>{{localize "PARTY-INVENTORY.inventory-list-title"}}</p>
+            <ul class="inventory-list">
+                {{#each items as |item|}}
+                    <li class="item flexrow" data-item-id="{{item.id}}" draggable="true">
                         <div class="item-name flexrow">
-                            <img class="item-image" tabindex="0" role="button" aria-label="{{item.name}}" src="{{item.img}}" data-edit="scratchpad.{{item.id}}.img" />
-                            <input class="flex2" type="text" value="{{item.name}}" name="scratchpad.{{item.id}}.name" placeholder="{{localize "PARTY-INVENTORY.name-placeholder"}}" data-dtype="String" />
+                            <div class="item-image" tabindex="0" role="button" aria-label="{{item.name}}" style="background-image: url('{{item.img}}')"></div>
+                            <h4>
+                                {{item.name~}}
+                                {{~#if item.isStack}} ({{item.system.quantity}}){{/if}}
+                            </h4>
                         </div>
-                        {{#if item.quantity}}
-                            <a class="item-control item-split flex0" data-action="split" title="{{localize "PARTY-INVENTORY.split-item"}}">
-                                <i class="fas fa-share-alt"></i>
-                            </a>
-                        {{/if}}
-                        {{#unless item.description}}
-                            <a class="item-control item-collapse flex0" data-action="collapse" title="{{localize "PARTY-INVENTORY.collapse-item"}}">
-                                {{#if item.isCollapsed}}
-                                    <i class="fas fa-book"></i>
-                                {{else}}
-                                    <i class="fas fa-book-open"></i>
-                                {{/if}}
-                            </a>
-                        {{/unless}}
-                        <select class="item-type-select" name="scratchpad.{{id}}.type" data-dtype="String">
-                            {{selectOptions ../typeLabels selected=type localize=true}}
-                        </select>
-                        <a class="item-control item-delete flex0" data-action="delete" title="{{localize "PARTY-INVENTORY.delete-item"}}">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                    </div>
-                    {{#if (or item.description (not item.isCollapsed))}}
-                        <div class="party-inventory__description-container">
-                            <textarea class="item-description" name="scratchpad.{{item.id}}.description" placeholder="{{localize "PARTY-INVENTORY.description-placeholder"}}">{{item.description}}</textarea>
+                        <div class="item-detail item-owner-name">
+                            {{item.charName}}
                         </div>
-                    {{/if}}
-                    {{#if item.hasFootnote}}
-                        <div class="party-inventory__footnote flexrow">
-                            {{#if item.quantity}}
-                                <div class="party-inventory__footnote-quantity flex0">
-                                    {{localize "PARTY-INVENTORY.item-quantity"}}: {{item.quantity}}
-                                </div>
-                            {{/if}}
+                    </li>
+                {{/each}}
+            </ul>
+        </div>
 
-                            {{#if item.sourceData}}
-                                <div class="party-inventory__footnote-data flex0">
-                                    <a class="preview-item">
-                                        <i class="fas fa-info-circle"></i>
-                                    </a>
-                                    {{localize "PARTY-INVENTORY.item-has-source-data"~}}
-                                    {{#if item.description}}
-                                        {{~localize "PARTY-INVENTORY.item-has-custom-description"}}
-                                    {{/if}}
-                                </div>
+        <div class="item-section">
+            <p>{{localize "PARTY-INVENTORY.scratchpad-title"}}</p>
+            <ul class="scratchpad">
+                {{#each scratchpadItems as |item|}}
+                    <li class="item" data-item-id={{item.id}}>
+                        <div class="item-row flexrow">
+                            <div class="item-name flexrow">
+                                <img class="item-image" tabindex="0" role="button" aria-label="{{item.name}}" src="{{item.img}}" data-edit="scratchpad.{{item.id}}.img" />
+                                <input class="flex2" type="text" value="{{item.name}}" name="scratchpad.{{item.id}}.name" placeholder="{{localize "PARTY-INVENTORY.name-placeholder"}}" data-dtype="String" />
+                            </div>
+                            {{#if item.quantity}}
+                                <a class="item-control item-split flex0" data-action="split" title="{{localize "PARTY-INVENTORY.split-item"}}">
+                                    <i class="fas fa-share-alt"></i>
+                                </a>
                             {{/if}}
+                            {{#unless item.description}}
+                                <a class="item-control item-collapse flex0" data-action="collapse" title="{{localize "PARTY-INVENTORY.collapse-item"}}">
+                                    {{#if item.isCollapsed}}
+                                        <i class="fas fa-book"></i>
+                                    {{else}}
+                                        <i class="fas fa-book-open"></i>
+                                    {{/if}}
+                                </a>
+                            {{/unless}}
+                            <select class="item-type-select" name="scratchpad.{{id}}.type" data-dtype="String">
+                                {{selectOptions ../typeLabels selected=type localize=true}}
+                            </select>
+                            <a class="item-control item-delete flex0" data-action="delete" title="{{localize "PARTY-INVENTORY.delete-item"}}">
+                                <i class="fas fa-trash"></i>
+                            </a>
                         </div>
-                    {{/if}}
-                </li>
-            {{/each}}
-        </ul>
+                        {{#if (or item.description (not item.isCollapsed))}}
+                            <div class="party-inventory__description-container">
+                                <textarea class="item-description" name="scratchpad.{{item.id}}.description" placeholder="{{localize "PARTY-INVENTORY.description-placeholder"}}">{{item.description}}</textarea>
+                            </div>
+                        {{/if}}
+                        {{#if item.hasFootnote}}
+                            <div class="party-inventory__footnote flexrow">
+                                {{#if item.quantity}}
+                                    <div class="party-inventory__footnote-quantity flex0">
+                                        {{localize "PARTY-INVENTORY.item-quantity"}}: {{item.quantity}}
+                                    </div>
+                                {{/if}}
+
+                                {{#if item.sourceData}}
+                                    <div class="party-inventory__footnote-data flex0">
+                                        <a class="preview-item">
+                                            <i class="fas fa-info-circle"></i>
+                                        </a>
+                                        {{localize "PARTY-INVENTORY.item-has-source-data"~}}
+                                        {{#if item.description}}
+                                            {{~localize "PARTY-INVENTORY.item-has-custom-description"}}
+                                        {{/if}}
+                                    </div>
+                                {{/if}}
+                            </div>
+                        {{/if}}
+                    </li>
+                {{/each}}
+            </ul>
+        </div>
     </div>
 
     <button class="flex0" type="button" data-action="create"><i class="fas fa-plus"></i> {{localize "PARTY-INVENTORY.add-new"}}</button>
