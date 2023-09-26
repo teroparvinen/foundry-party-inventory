@@ -77,7 +77,10 @@ Hooks.on('renderActorSheet5eCharacter', (sheet, html, character) => {
         addTogglePartyButton(html, sheet.actor);
     }
 });
-
+Hooks.on('renderItemSheet5eWithBags', (sheet, html, item) => {
+  let sheetClasses = sheet.options.classes;
+  addTogglePartyButton(html, sheet.object);
+});
 Hooks.on('getActorSheet5eCharacterHeaderButtons', (app, buttons) => {
     buttons.unshift({
         class: 'open-party-inventory-button',
